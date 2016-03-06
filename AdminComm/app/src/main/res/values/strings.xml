@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Admin Application</string>
+    <string name="action_settings">Settings</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="welcomeText">Welcome</string>
+    <string name="signin">Sign In</string>
+    <string name="fname">First Name</string>
+    <string name="lname">Last Name</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="uwiID">University ID Number</string>
+    <string name="faculty">Faculty</string>
+    <string name="dept">Department</string>
+    <string name="addBtn">Add User</string>
+    <string name="calBtn">Calendar</string>
+</resources>
