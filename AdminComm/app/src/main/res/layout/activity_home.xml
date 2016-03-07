@@ -10,6 +10,7 @@
     tools:context="com.example.megan.admincomm.HomeActivity"
     android:orientation="vertical">
 
+
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

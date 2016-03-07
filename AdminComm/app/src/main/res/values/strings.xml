@@ -13,5 +13,13 @@
     <string name="faculty">Faculty</string>
     <string name="dept">Department</string>
     <string name="addBtn">Add User</string>
-    <string name="calBtn">Calendar</string>
+    <string name="calBtn">Select</string>
+    <string name="dob">Date of Birth (YYYY/MM/DD)</string>
+    <string name="emerg">Emergency Contact</string>
+    <string name="med">Medical Contact</string>
+    <string name="extNo">Extension (Optional)</string>
+    <string name="number">Phone number</string>
+    <string name="submit">Submit</string>
+    <string name="contactInst">Please select a cateogory:</string>
+    <string name="loc">Destination</string>
 </resources>

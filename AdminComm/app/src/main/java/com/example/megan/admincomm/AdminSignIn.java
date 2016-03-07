@@ -51,7 +51,7 @@ public class AdminSignIn extends AppCompatActivity {
                 Intent intent= new Intent(getApplicationContext(),HomeActivity.class);
              //   intent.putExtra("username",uname);
                 startActivity(intent);
-                //closeActivity(getApplicationContext());
+                closeActivity();
 
 //                JSONObject jsonObject=new JSONObject();
 //                try {
@@ -72,7 +72,7 @@ public class AdminSignIn extends AppCompatActivity {
 
     }
 
-    public void closeActivity(Context c){
+    public void closeActivity(){
         //below does not work inside a json request
         this.finish();
     }
