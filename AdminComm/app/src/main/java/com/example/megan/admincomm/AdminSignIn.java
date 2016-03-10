@@ -25,7 +25,7 @@ public class AdminSignIn extends AppCompatActivity {
     private Button button;
     private EditText username;
     private EditText password;
-    private final String URL="";
+    private final String URL="https://projectcomp3990.herokuapp.com/login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,21 +48,21 @@ public class AdminSignIn extends AppCompatActivity {
                 String pass= passwordWrapper.getEditText().getText().toString();
 
                 // go to a new activity
-                Intent intent= new Intent(getApplicationContext(),HomeActivity.class);
-             //   intent.putExtra("username",uname);
-                startActivity(intent);
-                closeActivity();
+//                Intent intent= new Intent(getApplicationContext(),HomeActivity.class);
+//             //   intent.putExtra("username",uname);
+//                startActivity(intent);
+//                closeActivity();
 
-//                JSONObject jsonObject=new JSONObject();
-//                try {
-//
-//                    jsonObject.put("uname",uname);
-//                    jsonObject.put("pass",pass);
-//                    webService(jsonObject,uname);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                JSONObject jsonObject=new JSONObject();
+                try {
+
+                    jsonObject.put("username",uname);
+                    jsonObject.put("password",pass);
+                    webService(jsonObject,uname);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
 
 
@@ -78,7 +78,7 @@ public class AdminSignIn extends AppCompatActivity {
     }
 
     public void webService(JSONObject obj, final String uname){
-
+    Log.d("ME","In web services created my json objects before");
 
         JsonObjectRequest jsonObjectReq= new JsonObjectRequest(Request.Method.POST, URL, obj,
                 new Response.Listener<JSONObject>() {
