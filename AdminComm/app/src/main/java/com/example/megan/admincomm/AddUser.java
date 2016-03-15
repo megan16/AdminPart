@@ -16,22 +16,18 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-
-import org.json.JSONObject;
-
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import org.apache.http.Header;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 public class AddUser extends AppCompatActivity {
-    private static final String URL ="" ;
+    private static final String URL ="https://projectcomp3990.herokuapp.com/signup";
     private EditText dobDate;
     private Button calendarBtn;
     private Button addUserBtn;
@@ -125,7 +121,20 @@ public class AddUser extends AppCompatActivity {
             } else {
                 //valid date    Toast.makeText(getApplicationContext(),"Valid date format",Toast.LENGTH_SHORT).show();
                 // else send json objects
-                Log.d("ME", "Send data as json objects to server ");
+                Log.d("MEG", "Send data to server "+removeDateFormat(dobDate.getText().toString().trim()));
+//TODO: make department n faculty a drop down list
+
+                RequestParams params= new RequestParams();
+                params.put("username",id.getText().toString().trim());
+                params.put("password",removeDateFormat(dobDate.getText().toString().trim()) );
+                params.put("fname",fname.getText().toString().trim());
+                params.put("lname",lname.getText().toString().trim());
+                params.put("dob",dobDate.getText().toString().trim());
+                params.put("gender",radioButton.getText().toString());
+                params.put("faculty",faculty.getText().toString().trim());
+                params.put("department",dept.getText().toString().trim());
+
+                webService(params);
 
             }
 
@@ -139,7 +148,7 @@ public class AddUser extends AppCompatActivity {
         int selected= radioGroup.getCheckedRadioButtonId();
         radioButton= (RadioButton) findViewById(selected);
         if(selected!=-1)
-            Log.d("ME", "Gender: " + radioButton.getText());
+            Log.d("MEG", "Gender: " + radioButton.getText());
 
     }
 
@@ -163,7 +172,7 @@ public class AddUser extends AppCompatActivity {
                     //setting it in edit text view
                     String d8=sdf.format(date);
                     dobDate.setText(sdf.format(date));
-                    Log.d("ME", "date string : " + sdf.format(date));
+                    Log.d("MEG", "date string : " + sdf.format(date));
 
 
 
@@ -205,37 +214,62 @@ public class AddUser extends AppCompatActivity {
         return date!=null;
     }
 
-    public void webService(JSONObject obj){
+    public void webService(RequestParams params){
 
-        JsonObjectRequest jsonObjectReq= new JsonObjectRequest(Request.Method.POST, URL, obj,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.e("ME", " response from server: " + response.toString());
+      AsyncHttpClient client= new AsyncHttpClient();
 
-                        if(response.toString().equals("ok")){
-                            Toast.makeText(getApplicationContext(), "priviledged page", Toast.LENGTH_LONG).show();
-
-                        }
-                        // hideprogress dialog();
+            client.addHeader("Content-Type", "application/x-www-form-urlencoded");
+            client.post(getApplicationContext(),URL, params,new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Log.d("MEG", "Success Status Code " + statusCode);
+                    Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_SHORT).show();
+                    try {
+                        String response=new String(responseBody,"UTF-8");
+                        Log.d("MEG", "Success Status Code " +response);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
                     }
-                },
-                new Response.ErrorListener(){
-                    @Override
-                    public  void onErrorResponse(VolleyError error){
-                        // hide progress dialog
-                        VolleyLog.d("ME", "Error: " + error.getMessage());
-                        Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG);
+                    // go to homepage
+                  //  Intent intent= new Intent(getApplicationContext(),HomeActivity.class);
+                    //startActivity(intent);
+                    closeActivity();
+
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+                    String response= null;
+                    try {
+                        response = new String(responseBody,"UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
                     }
+                    Toast.makeText(getApplicationContext(),""+statusCode+".."+response,Toast.LENGTH_SHORT).show();
+                    Log.d("MEG", "Failure Status Code " + statusCode+".."+response);
 
-
-
-
-                });
+                    if(statusCode==500){
+                        Toast.makeText(getApplicationContext(),"Ensure that ID doesnt already exist",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
 
 
     }
+
+    public String removeDateFormat(String date){
+        return date=date.replaceAll("/", "");
+    }
+
+
+    public void closeActivity() {
+
+            this.finish();
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

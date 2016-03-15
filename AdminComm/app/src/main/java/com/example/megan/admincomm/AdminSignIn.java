@@ -1,5 +1,6 @@
 package com.example.megan.admincomm;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,110 +12,121 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.message.BasicHttpResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+
+
 
 public class AdminSignIn extends AppCompatActivity {
 
     private Button button;
     private EditText username;
     private EditText password;
-    private final String URL="https://projectcomp3990.herokuapp.com/login";
+    private final static String URL = "https://projectcomp3990.herokuapp.com/login";
+    //private RequestQueue queue;//
+    HurlStack hurlStack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_sign_in);
 
-        final TextInputLayout usernameWrapper= (TextInputLayout) findViewById(R.id.unameWrapper);
-        final TextInputLayout passwordWrapper= (TextInputLayout) findViewById(R.id.passwordWrapper);
+        final TextInputLayout usernameWrapper = (TextInputLayout) findViewById(R.id.unameWrapper);
+        final TextInputLayout passwordWrapper = (TextInputLayout) findViewById(R.id.passwordWrapper);
+
+        username= (EditText) findViewById(R.id.uname);
+        password= (EditText) findViewById(R.id.pass);
 
         usernameWrapper.setHint("Username");
         passwordWrapper.setHint("Password");
 
-        button= (Button) findViewById(R.id.signInBtn);
+        button = (Button) findViewById(R.id.signInBtn);
 
+//TODO: Check for empty fields
 
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                String uname=usernameWrapper.getEditText().getText().toString();
-                String pass= passwordWrapper.getEditText().getText().toString();
+            public void onClick(View v) {
+                String uname = usernameWrapper.getEditText().getText().toString();
 
-                // go to a new activity
-//                Intent intent= new Intent(getApplicationContext(),HomeActivity.class);
-//             //   intent.putExtra("username",uname);
-//                startActivity(intent);
-//                closeActivity();
-
-                JSONObject jsonObject=new JSONObject();
-                try {
-
-                    jsonObject.put("username",uname);
-                    jsonObject.put("password",pass);
-                    webService(jsonObject,uname);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-
+                Log.d("MEG", "Button clicked => " + username.getText().toString() + "" + password.getText().toString());
+                RequestParams params= new RequestParams();
+                params.put("username",uname.trim());
+                params.put("password", passwordWrapper.getEditText().getText().toString().trim());
+                webService(params);
             }
         });
 
 
     }
 
-    public void closeActivity(){
-        //below does not work inside a json request
+    public void closeActivity() {
+        //below does not work inside web service function
         this.finish();
     }
 
-    public void webService(JSONObject obj, final String uname){
-    Log.d("ME","In web services created my json objects before");
+    public void webService(RequestParams params) {
 
-        JsonObjectRequest jsonObjectReq= new JsonObjectRequest(Request.Method.POST, URL, obj,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.e("ME", " response from server: " + response.toString());
+        AsyncHttpClient client= new AsyncHttpClient();
 
-                        if(response.toString().equals("priviledged page")){
-                            Toast.makeText(getApplicationContext(), "Redirecting", Toast.LENGTH_LONG).show();
-                            // go to a new activity
-                            Intent intent= new Intent(getApplicationContext(),HomeActivity.class);
-                            intent.putExtra("username",uname);
-                            startActivity(intent);
-                            //closeActivity();
-
-                        }
-
-                    }
-                },
-                new Response.ErrorListener(){
-                    @Override
-                    public  void onErrorResponse(VolleyError error){
-                        // hide progress dialog
-                        VolleyLog.d("ME", "Error: " + error.getMessage());
-                        Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG);
-                    }
+        client.addHeader("Content-Type","application/x-www-form-urlencoded");
+        client.post(getApplicationContext(),URL, params,new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Log.d("MEG", "Success Status Code " + statusCode);
+                Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_SHORT).show();
+                try {
+                    String response=new String(responseBody,"UTF-8");
+                    Log.d("MEG", "Success Status Code " +response);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                // go to homepage
+                Intent intent= new Intent(getApplicationContext(),HomeActivity.class);
+                startActivity(intent);
+                closeActivity();
 
 
+            }
 
-
-                });
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.d("MEG","Failure Status Code "+statusCode);
+                String response= null;
+                try {
+                    response = new String(responseBody,"UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getApplicationContext(),""+statusCode+".."+response,Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
 
     }
-
-
-
 }
