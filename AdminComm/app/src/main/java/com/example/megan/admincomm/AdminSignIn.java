@@ -73,7 +73,6 @@ public class AdminSignIn extends AppCompatActivity {
             public void onClick(View v) {
                 String uname = usernameWrapper.getEditText().getText().toString();
 
-                Log.d("MEG", "Button clicked => " + username.getText().toString() + "" + password.getText().toString());
                 RequestParams params= new RequestParams();
                 params.put("username",uname.trim());
                 params.put("password", passwordWrapper.getEditText().getText().toString().trim());
@@ -93,7 +92,7 @@ public class AdminSignIn extends AppCompatActivity {
 
         AsyncHttpClient client= new AsyncHttpClient();
 
-        client.addHeader("Content-Type","application/x-www-form-urlencoded");
+        //client.addHeader("Content-Type","application/x-www-form-urlencoded");//?? it magically works now
         client.post(getApplicationContext(),URL, params,new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
